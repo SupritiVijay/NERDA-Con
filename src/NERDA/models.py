@@ -13,7 +13,7 @@ from NERDA.datasets import get_conll_data
 from NERDA.networks import NERDANetwork
 from NERDA.predictions import predict, predict_text
 from NERDA.performance import compute_f1_scores, flatten
-from NERDA.training import train_model
+from NERDA.training import train_model, train_model_next_task
 import pandas as pd
 import numpy as np
 import torch
@@ -181,6 +181,9 @@ class NERDA:
         self.valid_loss = np.nan
         self.quantized = False
         self.halved = False
+        self.fisher_dict= {}
+        self.opt_param_dict = {}
+        self.task_id = 0
 
     def train(self) -> str:
         """Train Network
@@ -213,6 +216,42 @@ class NERDA:
         setattr(self, "valid_loss", valid_loss)
 
         return "Model trained successfully"
+    
+     def train_next_task(self, new_dataset_training, new_dataset_validation) -> str:
+        """Train Network
+
+        Trains the network from the NERDA model specification.
+
+        Returns:
+            str: a message saying if the model was trained succesfully.
+            The network in the 'network' attribute is trained as a 
+            side-effect. Training losses and validation loss are saved 
+            in 'training_losses' and 'valid_loss' 
+            attributes respectively as side-effects.
+        """
+        network, train_losses, valid_loss = train_model_next_task(network = self.network,
+                                                        tag_encoder = self.tag_encoder,
+                                                        tag_outside = self.tag_outside,
+                                                        transformer_tokenizer = self.transformer_tokenizer,
+                                                        transformer_config = self.transformer_config,
+                                                        dataset_training = new_dataset_training,
+                                                        dataset_validation = new_dataset_validation,
+                                                        validation_batch_size = self.validation_batch_size,
+                                                        max_len = self.max_len,
+                                                        device = self.device,
+                                                        num_workers = self.num_workers,
+                                                        task_id = self.task_id,
+                                                        fisher_dict=self.fisher_dict,
+                                                        opt_param_dict = self.opt_param_dict,
+                                                        **self.hyperparameters)
+        
+        # attach as attributes to class
+        setattr(self, "network", network)
+        setattr(self, "train_losses", train_losses)
+        setattr(self, "valid_loss", valid_loss)
+
+        return "Model trained successfully"
+
 
     def load_network_from_file(self, model_path = "model.bin") -> str:
         """Load Pretrained NERDA Network from file
