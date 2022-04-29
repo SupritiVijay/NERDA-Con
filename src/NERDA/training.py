@@ -168,5 +168,137 @@ def train_model(network,
 
     return network, train_losses, best_valid_loss
 
+def on_task_update(task_id,fisher_dict,opt_param_dict, model, dl_train, optimizer, device, scheduler, n_tags, shared_model):
+    model.train()
+    optimizer.zero_grad()
+    
+    for dl in tqdm(data_loader, total=len(data_loader)):
+        outputs = model(**dl)
+        loss = compute_loss(outputs, 
+                            dl.get('target_tags'),
+                            dl.get('masks'), 
+                            device, 
+                            n_tags)
+        loss.backward()
+    
+    fisher_dict[task_id] = {}
+    opt_param_dict[task_id] = {}
+    
+    for name,param in shared_model.named_parameters():
+        opt_param_dict[task_id][name] = param.data.clone()
+        fisher_dict[task_id][name] = param.grad.data.clone().pow(2)
+    
+def train_ewc(task_id,fisher_dict,opt_param_dict, model, dl_train, optimizer, device, scheduler, n_tags, shared_model, ewc_lambda):
+    
+    model.train()    
+    final_loss = 0.0
+    
+    for dl in tqdm(data_loader, total=len(data_loader)):
+
+        optimizer.zero_grad()
+        outputs = model(**dl)
+        loss = compute_loss(outputs, 
+                            dl.get('target_tags'),
+                            dl.get('masks'), 
+                            device, 
+                            n_tags)
+        for task in range(task_id):
+            for name,param in shared_model.named_parameters():
+                fisher = fisher_dict[task][name]
+                opt_param = opt_param_dict[task][name]
+                loss += (fisher * (opt_param - param).pow(2)).sum() *ewc_lambda
+                    
+            
+        loss.backward()
+        optimizer.step()
+        scheduler.step()
+        final_loss += loss.item()
+
+    # Return average loss
+    return final_loss / len(data_loader)
+
+def train_model_new_task(network,
+                tag_encoder,
+                tag_outside,
+                transformer_tokenizer,
+                transformer_config,
+                dataset_training, 
+                dataset_validation, 
+                max_len = 128,
+                train_batch_size = 16,
+                validation_batch_size = 8,
+                epochs = 5,
+                warmup_steps = 0,
+                learning_rate = 5e-5,
+                device = None,
+                fixed_seed = 42,
+                num_workers = 1,
+                task_id = 0,
+                fisher_dict = {},
+                opt_param_dict = {},
+                shared_model = None,
+                ewc_lambda = 0.2):
+    
+    if fixed_seed is not None:
+        enforce_reproducibility(fixed_seed)
+        
+    if shared_model is None:
+        shared_model = network
+    
+    # compute number of unique tags from encoder.
+    n_tags = tag_encoder.classes_.shape[0]
+
+    # prepare datasets for modelling by creating data readers and loaders
+    dl_train = create_dataloader(sentences = dataset_training.get('sentences'),
+                                 tags = dataset_training.get('tags'), 
+                                 transformer_tokenizer = transformer_tokenizer, 
+                                 transformer_config = transformer_config,
+                                 max_len = max_len, 
+                                 batch_size = train_batch_size, 
+                                 tag_encoder = tag_encoder,
+                                 tag_outside = tag_outside,
+                                 num_workers = num_workers)
+    dl_validate = create_dataloader(sentences = dataset_validation.get('sentences'), 
+                                    tags = dataset_validation.get('tags'),
+                                    transformer_tokenizer = transformer_tokenizer,
+                                    transformer_config = transformer_config, 
+                                    max_len = max_len, 
+                                    batch_size = validation_batch_size, 
+                                    tag_encoder = tag_encoder,
+                                    tag_outside = tag_outside,
+                                    num_workers = num_workers)
+
+    optimizer_parameters = network.parameters()
+
+    num_train_steps = int(len(dataset_training.get('sentences')) / train_batch_size * epochs)
+    
+    optimizer = AdamW(optimizer_parameters, lr = learning_rate)
+    scheduler = get_linear_schedule_with_warmup(
+        optimizer, num_warmup_steps = warmup_steps, num_training_steps = num_train_steps
+    )
+
+    train_losses = []
+    best_valid_loss = np.inf
+
+    for epoch in range(epochs):
+        
+        print('\n Epoch {:} / {:}'.format(epoch + 1, epochs))
+
+        train_loss = train_ewc(task_id,fisher_dict,opt_param_dict, network, dl_train, optimizer, device, scheduler, n_tags, shared_model, ewc_lambda)
+        train_losses.append(train_loss)
+        valid_loss = validate(network, dl_validate, device, n_tags)
+
+        print(f"Train Loss = {train_loss} Valid Loss = {valid_loss}")
+
+        if valid_loss < best_valid_loss:
+            best_parameters = network.state_dict()            
+            best_valid_loss = valid_loss
+    
+    on_task_update(task_id,fisher_dict,opt_param_dict, network, dl_train, optimizer, device, scheduler, n_tags, shared_model)
+    # return best model
+    # network.load_state_dict(best_parameters)
+
+    return network, train_losses, best_valid_loss
+
 
         
