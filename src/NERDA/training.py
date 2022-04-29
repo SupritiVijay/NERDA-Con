@@ -168,7 +168,7 @@ def train_model(network,
 
     return network, train_losses, best_valid_loss
 
-def on_task_update(task_id,fisher_dict,opt_param_dict, model, dl_train, optimizer, device, scheduler, n_tags, shared_model):
+def on_task_update(task_id,fisher_dict,opt_param_dict, model, data_loader, optimizer, device, scheduler, n_tags, shared_model):
     model.train()
     optimizer.zero_grad()
     
@@ -188,7 +188,7 @@ def on_task_update(task_id,fisher_dict,opt_param_dict, model, dl_train, optimize
         opt_param_dict[task_id][name] = param.data.clone()
         fisher_dict[task_id][name] = param.grad.data.clone().pow(2)
     
-def train_ewc(task_id,fisher_dict,opt_param_dict, model, dl_train, optimizer, device, scheduler, n_tags, shared_model, ewc_lambda):
+def train_ewc(task_id,fisher_dict,opt_param_dict, model, data_loader, optimizer, device, scheduler, n_tags, shared_model, ewc_lambda):
     
     model.train()    
     final_loss = 0.0
