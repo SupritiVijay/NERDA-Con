@@ -249,6 +249,7 @@ class NERDA:
         setattr(self, "network", network)
         setattr(self, "train_losses", train_losses)
         setattr(self, "valid_loss", valid_loss)
+        self.task_id += 1
 
         return "Model trained successfully"
 
