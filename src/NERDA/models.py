@@ -217,7 +217,7 @@ class NERDA:
 
         return "Model trained successfully"
     
-     def train_next_task(self, new_dataset_training, new_dataset_validation) -> str:
+    def train_next_task(self, new_dataset_training, new_dataset_validation) -> str:
         """Train Network
 
         Trains the network from the NERDA model specification.
