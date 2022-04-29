@@ -13,7 +13,7 @@ from NERDA.datasets import get_conll_data
 from NERDA.networks import NERDANetwork
 from NERDA.predictions import predict, predict_text
 from NERDA.performance import compute_f1_scores, flatten
-from NERDA.training import train_model, train_model_next_task
+from NERDA.training import train_model, train_model_new_task
 import pandas as pd
 import numpy as np
 import torch
@@ -229,7 +229,7 @@ class NERDA:
             in 'training_losses' and 'valid_loss' 
             attributes respectively as side-effects.
         """
-        network, train_losses, valid_loss = train_model_next_task(network = self.network,
+        network, train_losses, valid_loss = train_model_new_task(network = self.network,
                                                         tag_encoder = self.tag_encoder,
                                                         tag_outside = self.tag_outside,
                                                         transformer_tokenizer = self.transformer_tokenizer,
