@@ -184,6 +184,7 @@ class NERDA:
         self.fisher_dict= {}
         self.opt_param_dict = {}
         self.task_id = 0
+        self.shared_model = None
 
     def train(self) -> str:
         """Train Network
@@ -243,6 +244,7 @@ class NERDA:
                                                         task_id = self.task_id,
                                                         fisher_dict=self.fisher_dict,
                                                         opt_param_dict = self.opt_param_dict,
+                                                        shared_model = self.shared_model,
                                                         **self.hyperparameters)
         
         # attach as attributes to class
