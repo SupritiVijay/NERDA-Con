@@ -4,14 +4,14 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="NERDA", 
-    version="1.0.0",
-    author="Lars Kjeldgaard, Lukas Christian Nielsen",
-    author_email="lars.kjeldgaard@eb.dk",
-    description="A Framework for Finetuning Transformers for Named-Entity Recognition",
+    name="NERDA_Con", 
+    version="0.0",
+    author="Supriti Vijay, Aman Priyanshu",
+    author_email="supriti.vijay@gmail.com",
+    description="Extending NERDA Library for Continual Learning",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/ebanalyse/NERDA",
+    url="https://github.com/SupritiVijay/NERDA-Con",
     packages=setuptools.find_packages(where='src'),
     package_dir={'': 'src'},
     python_requires='>=3.6',

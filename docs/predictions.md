@@ -1,2 +1,0 @@
-# Predictions
-::: NERDA.predictions

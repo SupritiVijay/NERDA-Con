@@ -9,11 +9,11 @@ The interface enables you to easily
 - evaluate it
 - use it to predict entities in new texts.
 """
-from NERDA.datasets import get_conll_data
-from NERDA.networks import NERDANetwork
-from NERDA.predictions import predict, predict_text
-from NERDA.performance import compute_f1_scores, flatten
-from NERDA.training import train_model, train_model_new_task
+from NERDA_Con.datasets import get_conll_data
+from NERDA_Con.networks import NERDANetwork
+from NERDA_Con.predictions import predict, predict_text
+from NERDA_Con.performance import compute_f1_scores, flatten
+from NERDA_Con.training import train_model, train_model_new_task
 import pandas as pd
 import numpy as np
 import torch

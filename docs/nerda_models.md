@@ -1,2 +1,0 @@
-# NERDA Models
-::: NERDA.models
