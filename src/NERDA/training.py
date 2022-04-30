@@ -6,7 +6,7 @@ import random
 import torch
 from IPython import get_ipython
 
-def isnotebook():
+if True:
     try:
         shell = get_ipython().__class__.__name__
         if shell == 'ZMQInteractiveShell':
@@ -17,8 +17,6 @@ def isnotebook():
             from tqdm import tqdm  # Other type (?)
     except NameError:
         from tqdm import tqdm 
-        
-isnotebook()
 
 def train(model, data_loader, optimizer, device, scheduler, n_tags):
     """One Iteration of Training"""
