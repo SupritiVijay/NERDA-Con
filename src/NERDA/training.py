@@ -172,7 +172,7 @@ def on_task_update(task_id,fisher_dict,opt_param_dict, model, data_loader, optim
     model.train()
     optimizer.zero_grad()
     
-    for dl in tqdm(data_loader, total=len(data_loader)):
+    for dl in tqdm(data_loader, total=len(data_loader), desc='Computing Fisher Score and optimal parameters'):
         outputs = model(**dl)
         loss = compute_loss(outputs, 
                             dl.get('target_tags'),
