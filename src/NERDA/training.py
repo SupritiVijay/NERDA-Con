@@ -4,7 +4,20 @@ from sklearn import preprocessing
 from transformers import AdamW, get_linear_schedule_with_warmup
 import random
 import torch
-from tqdm import tqdm
+
+def isnotebook():
+    try:
+        shell = get_ipython().__class__.__name__
+        if shell == 'ZMQInteractiveShell':
+            from tqdm.notebook import tqdm   # Jupyter notebook or qtconsole
+        elif shell == 'TerminalInteractiveShell':
+            from tqdm import tqdm # Terminal running IPython
+        else:
+            from tqdm import tqdm  # Other type (?)
+    except NameError:
+        from tqdm import tqdm 
+        
+isnotebook()
 
 def train(model, data_loader, optimizer, device, scheduler, n_tags):
     """One Iteration of Training"""
