@@ -197,8 +197,11 @@ def on_task_update(task_id,fisher_dict,opt_param_dict, model, data_loader, optim
     opt_param_dict[task_id] = {}
     
     for name,param in shared_model.named_parameters():
-        opt_param_dict[task_id][name] = param.data.clone()
-        fisher_dict[task_id][name] = param.grad.data.clone().pow(2)
+        try:
+            opt_param_dict[task_id][name] = param.data.clone()
+            fisher_dict[task_id][name] = param.grad.data.clone().pow(2)
+        except:
+            continue
     
 def train_ewc(task_id,fisher_dict,opt_param_dict, model, data_loader, optimizer, device, scheduler, n_tags, shared_model, ewc_lambda):
     
@@ -216,9 +219,12 @@ def train_ewc(task_id,fisher_dict,opt_param_dict, model, data_loader, optimizer,
                             n_tags)
         for task in range(task_id):
             for name,param in shared_model.named_parameters():
-                fisher = fisher_dict[task][name]
-                opt_param = opt_param_dict[task][name]
-                loss += (fisher * (opt_param - param).pow(2)).sum() *ewc_lambda
+                try:
+                    fisher = fisher_dict[task][name]
+                    opt_param = opt_param_dict[task][name]
+                    loss += (fisher * (opt_param - param).pow(2)).sum() *ewc_lambda
+                except:
+                    continue
                     
             
         loss.backward()
