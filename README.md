@@ -24,6 +24,19 @@ To set shared model parameters,
 
 `model.shared_model = model.transformer_model`
 
+## NERDA
+
+Nerda is a framework for fine-tuning pretrained transformers for Named-Entity Recognition (NER) tasks.
+```
+@inproceedings{nerda,
+  title = {NERDA},
+  author = {Kjeldgaard, Lars and Nielsen, Lukas},
+  year = {2021},
+  publisher = {{GitHub}},
+  url = {https://github.com/ebanalyse/NERDA}
+}
+```
+
 ## Cite This Work
 
 ```
@@ -36,3 +49,4 @@ To set shared model parameters,
 }
 
 ``` 
+
