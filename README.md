@@ -1,4 +1,4 @@
-# NERDA-Con <img src="https://raw.githubusercontent.com/SupritiVijay/NERDA-Con/main/logo.png" align="right" height=250/>
+# NERDA-Con <img src="https://raw.githubusercontent.com/SupritiVijay/NERDA-Con/main/logo.png" align="right" height=350/>
 
 Extending NERDA Library for Continual Learning
 
