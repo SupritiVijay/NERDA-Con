@@ -26,7 +26,7 @@ To set shared model parameters,
 
 ## NERDA
 
-Nerda is a framework for fine-tuning pretrained transformers for Named-Entity Recognition (NER) tasks.
+[Nerda](https://github.com/ebanalyse/NERDA) is a framework for fine-tuning pretrained transformers for Named-Entity Recognition (NER) tasks.
 ```
 @inproceedings{nerda,
   title = {NERDA},
