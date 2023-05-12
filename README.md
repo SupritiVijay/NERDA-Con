@@ -6,6 +6,10 @@ Extending NERDA Library for Continual Learning
 
 `pip install NERDA-Con`
 
+Due to a recent issue with `scikit-learn` installation, which is an ongoing issue with the original NERDA, we have fixed it on the GitHub repository, and you can install the updated version as follows:
+
+`pip install nerda-con@git+https://github.com/SupritiVijay/nerda-con`
+
 ## Implementation and Execution
 
 ### Training
